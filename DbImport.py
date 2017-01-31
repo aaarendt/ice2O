@@ -10,7 +10,7 @@ Created by Emily Baker, 2017
 
 #Modules loaded internally with 'import DbImport' (this an Emily-defined module)
 import os, sys
-sys.path.append("C:\Users\ehbaker\Documents\Functions")
+sys.path.append("C:\Users\ehbaker\Documents\Python\Modules")
 import DbImport
 import pandas as pd
 import numpy as np
@@ -53,3 +53,54 @@ def add_sequential_IDs_to_pkey(df, db_table, engine):
 	new_pkeys=range(max_pkey +1, max_pkey+ 1 + df.shape[0]) #Create list of subsequent integers to add to primary key column
 	df[pkey]=new_pkeys
 	return(df)
+
+def define_db_table_format(df, db_table, engine):
+    """
+    For a given table in the database, return a dictionary with column_name:type. This can then be passed back to the table, for appending rows to an existing table.
+    """
+    #Find column name and type for exisitng DB table
+    query="""SELECT attname, format_type(atttypid, atttypmod) AS type
+     FROM   pg_attribute
+     WHERE  attrelid = '%s'::regclass
+     AND    attnum > 0
+     AND    NOT attisdropped
+     ORDER  BY attnum;""" %(db_table)
+    types=pd.read_sql(query, engine)
+    
+    #Create a dictionary, which can be passed during table upload in df.to_sql()
+    #types_dict=dict(zip(types.attname, types.type))
+    
+    #Check to see if the columns in the new data frame match the ones in the database
+    #columns_match=set(list(tab_format['attname'])) ==set(list(df))
+    
+    #if (columns_match) == T:
+        #print ('columns match')
+    #else:
+        #print("ERROR: Columns in data frame and database DO NOT match")
+    
+    return(types)
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
