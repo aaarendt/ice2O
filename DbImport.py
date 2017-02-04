@@ -34,9 +34,16 @@ def pkey_NameAndType(db_table, engine):
 	WHERE  i.indrelid = """ + "'" + db_table+ "'" + """::regclass
 	AND    i.indisprimary;"""
 	res=pd.read_sql(query, engine)
-	pkey=res['attname'][0]
-	print("Primary key for " +db_table+ " is: " + pkey)
-	return (res)	
+	if res.shape[0]>0:
+		pkey=res['attname'][0]
+		#print("Primary key for " +db_table+ " is: " + pkey)
+		pkey=res['attname'][0]
+		print("Primary key for " +db_table+ " is: " + pkey)
+		return (res)
+	else:
+		print("PLEASE NOTE: Table has NO primary key")
+		res='None'
+		return(res)
 
 def add_sequential_IDs_to_pkey(df, db_table, engine):
 	"""
@@ -54,7 +61,7 @@ def add_sequential_IDs_to_pkey(df, db_table, engine):
 	df[pkey]=new_pkeys
 	return(df)
 
-def define_db_table_format(df, db_table, engine):
+def define_db_table_format(db_table, engine):
     """
     For a given table in the database, return a dictionary with column_name:type. This can then be passed back to the table, for appending rows to an existing table.
     """
@@ -80,7 +87,28 @@ def define_db_table_format(df, db_table, engine):
     
     return(types)
 
-    
+def set_column_types_to_match_other_table(colnames, coltypes, db_name, engine):
+	"""Input:
+	#colnames: list of names of columns in the database whose format you want to copy. Must match name of column in new table
+	#coltypes:List of Postgres types, for corresponding columns in colnames
+	#dbname: name of table in database THAT YOU WILL BE ALTERING (not the table whose format you are copying)
+	#engine: connection to the databse WHERE YOU've UPLOADED the new table.
+	#Will change only the columns in these lists, leaving others intact. If there are columns whose format should not be cnhanged, leave out of list."""
+
+	for xx in range(0,len(colnames)):
+		col_name=colnames[xx]
+		col_type=coltypes[xx]
+		query=(r"""ALTER TABLE %s
+		 ALTER COLUMN %s TYPE %s
+		 USING %s::%s""")%(db_name, col_name, col_type, col_name, col_type)
+		engine.execute(query)
+		print("done with " +col_name)
+	print("DONE with changing column types in " + db_name)
+	return()
+
+def list_columns_in_db_table(db_name, engine):
+	query=("SELECT column_name FROM information_schema.columns WHERE table_name   = %s")%(db_name)
+	
     
     
     
