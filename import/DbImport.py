@@ -10,14 +10,26 @@ Created by Emily Baker, 2017
 
 #Modules loaded internally with 'import DbImport' (this an Emily-defined module)
 import os, sys
-sys.path.append("C:\Users\ehbaker\Documents\Python\Modules")
-import DbImport
 import pandas as pd
 import numpy as np
 import glob 
 import psycopg2
 from sqlalchemy import create_engine
 from geopandas import GeoSeries, GeoDataFrame
+
+def startEngine(connectionString):
+   '''
+   Instantiates a database connection from a list of credentials
+   connectionString: dictionary of database credentials
+   returns: SQLAlchemy database engine
+   '''
+   cs = connectionString
+   
+   # NOTE: a modification is needed to parse the password string: a Python 3.5 issue we should address
+   engine = create_engine('postgresql://' + cs['user'] + ':' + str(cs['password'])[2:-1] + '@' + cs['host'] + ':' + cs['port'] + '/' + cs['dbname'])
+
+   return engine 
+   
 
 def pkey_NameAndType(db_table, engine):
 	"""
@@ -108,27 +120,3 @@ def set_column_types_to_match_other_table(colnames, coltypes, db_name, engine):
 
 def list_columns_in_db_table(db_name, engine):
 	query=("SELECT column_name FROM information_schema.columns WHERE table_name   = %s")%(db_name)
-	
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
