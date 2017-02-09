@@ -1,25 +1,25 @@
-import sys
-import pandas as pd
-import psycopg2
-from sqlalchemy import create_engine
-sys.path.append("C:/Users/ehbaker/Documents/Python/Repos/ice2O") #Path to where DBImport.py is saved
-import DbImport #This is a module that I have written, stored one directory up (cd ..)
-import numpy as np
-import settings
+'''
+   script to import new data to the ice2O database
+'''
 
-#User-supplied criteria:
-pth=(r"Q:\Project Data\GlacierData\WOLVERINE\Draw_Wire\data\processed\draw_wire_database.csv") #path to csv for upload
-db_table='draw_wire' #name of table in the database which you want to copy
-sandbox_tab_name='draw_wire_ingest' #Name of table in database you want to append to. Data will match existing column types.
+# external modules
+import pandas as pd
+import numpy as np
+
+# internal modules
+import DbImport 
+from settings import *
 
 #Connect to the database
-cs=settings.import_cs()
-engine = create_engine('postgresql://' + cs['user'] + ':' + str(cs['password']) + '@' + cs['host'] + ':' + cs['port'] + '/' + cs['dbname'])
+cs = AWS_localhost_sandbox
+engine = DbImport.startEngine(cs)
+
+inPath = ingest_names["pth"]
 
 #Read in table for upload
-df=pd.read_csv(r"Q:\Project Data\GlacierData\WOLVERINE\Draw_Wire\data\processed\draw_wire_database.csv")
+df=pd.read_csv(inPath)
 #Specify the table in the database to which it will be appended.
-db_table='draw_wire'
+db_table = ingest_names["appendToTable"]
 
 #Query database for column name of table primary key, and type (e.g. bigint, string, etc.)
 res=DbImport.pkey_NameAndType(db_table, engine)
@@ -40,12 +40,13 @@ types=DbImport.define_db_table_format(db_table, engine)
 columns_match=set(list(types['attname'])) ==set(list(df))
 
 #Create connection to the sandbox (where table will be uploaded)
-engine_sand = create_engine('postgresql://' + cs['user'] + ':' + str(cs['password']) + '@' + cs['host'] + ':' + cs['port'] + '/' + 'sandbox')
+cs = AWS_localhost_sandbox
+engine = DbImport.startEngine(cs)
 
 #Add new table
 #APPENDING to existing table will automatically keep the column types intact!
 if columns_match==True:
-    df.to_sql(name=sandbox_tab_name, con=engine_sand, index = False, if_exists='append')
+    df.to_sql(name=db_table, con=engine, index = False, if_exists='append')
 else: print("ERROR: columns in uploaded table do not match those in DB")
 
 
