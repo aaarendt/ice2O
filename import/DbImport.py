@@ -10,7 +10,6 @@ Created by Emily Baker, 2017
 
 #Modules loaded internally with 'import DbImport' (this an Emily-defined module)
 import os, sys
-sys.path.append("C:\Users\ehbaker\Documents\Python\Modules")
 import DbImport
 import pandas as pd
 import numpy as np
