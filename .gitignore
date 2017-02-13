@@ -1,4 +1,4 @@
 settings.py
-settings.pyc
+settings*
 *.pyc
 .ipynb_checkpoints
