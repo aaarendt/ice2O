@@ -17,7 +17,7 @@ from sqlalchemy import create_engine
 import numpy as np
 
 #internal modules
-thisfilelocation=os.getcwdu() #path for this file
+thisfilelocation=os.getcwd() #path for this file
 sys.path.append(os.path.dirname(thisfilelocation)) #add a folder one level up to the system path; this is where modules are stored
 import DbImport #User defined module in the folder added to path in line above.
 from settings import *
@@ -162,7 +162,7 @@ current_tab=pd.read_sql(query, engine_sand)
 remove_cols=set(list(current_tab)) - set(list(types['attname']))
 
 for col in remove_cols:
-    print "Removing " + col
+    print ("Removing " + col)
     rm_query="ALTER TABLE %s DROP COLUMN %s"%(dbnamePts, col)
     engine_sand.execute(rm_query)
 
