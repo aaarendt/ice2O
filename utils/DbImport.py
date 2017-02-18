@@ -8,7 +8,7 @@ CREATION
 Created by Emily Baker, 2017
 """
 
-#Modules loaded internally with 'import DbImport' (this an Emily-defined module)
+#Modules loaded internally with 'import DbImport'; this file's location must be added to the system path first 
 import os, sys
 import pandas as pd
 import numpy as np
