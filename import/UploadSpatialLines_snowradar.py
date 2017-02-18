@@ -18,9 +18,11 @@ import numpy as np
 
 #internal modules
 thisfilelocation=os.getcwd() #path for this file
-sys.path.append(os.path.dirname(thisfilelocation)) #add a folder one level up to the system path; this is where modules are stored
+utils_folder=os.path.join(os.path.dirname(thisfilelocation), "utils")
+sys.path.append(utils_folder) #add a folder one level up to the system path; this is where modules are stored
 import DbImport #User defined module in the folder added to path in line above.
 from settings import *
+from utils import DbImport
 
 #Read information on table and metadata location info for snow radar data
 db_points_table=ingest_names_snowradar["copyFromTable"]#table with points in the db
